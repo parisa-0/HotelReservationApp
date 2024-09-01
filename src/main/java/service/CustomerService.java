@@ -1,10 +1,12 @@
 package service;
 
+import api.HotelResource;
 import model.Customer;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Scanner;
 
 public class CustomerService {
 
@@ -23,9 +25,9 @@ public class CustomerService {
         return instance;
     }
 
-    List<Customer> customers = new ArrayList<>();
+    static List<Customer> customers = new ArrayList<>();
 
-    public void addCustomer(String email, String firstName, String lastName) {
+    public static void addCustomer(String email, String firstName, String lastName) {
         customers.add(new Customer(firstName, lastName, email));
     }
 
@@ -38,7 +40,24 @@ public class CustomerService {
         return null;
    }
 
-   public Collection<Customer> getAllCustomers() {
+   public static Collection<Customer> getAllCustomers() {
         return customers;
    }
+/*
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Please provide your first name");
+        String firstName = scanner.nextLine();
+        System.out.println("Please provide your last name");
+        String lastName = scanner.nextLine();
+        System.out.println("Please provide your email address");
+        String email = scanner.nextLine();
+        HotelResource.createACustomer(email, firstName, lastName);
+        System.out.println("account created!");
+        addCustomer(email, firstName,lastName);
+        System.out.println(customers);
+        System.out.println(getAllCustomers());
+    }
+
+ */
 }

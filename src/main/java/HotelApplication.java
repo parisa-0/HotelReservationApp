@@ -12,27 +12,27 @@ public class HotelApplication {
     private static final HotelResource hotelResource = HotelResource.getInstance();
     private static final AdminResource adminResource = AdminResource.getInstance();
 
-    public static void main(String[] args) throws ParseException {
 
-        MainMenu.printMainMenu();
-        Scanner scanner = new Scanner(System.in);
-        String line = scanner.nextLine();
-        if(Integer.parseInt(line) > 0 && Integer.parseInt(line) < 6) {
-            switch (line) {
-                case "1" -> findAndReserveARoom();
-                case "2" -> seeMyReservations();
-                case "3" -> createAnAccount();
-                case "4" -> adminMenu();
-                case "5" -> scanner.close();
+        private static void mainMenuSelection() throws ParseException {
+            MainMenu.printMainMenu();
+            Scanner scanner = new Scanner(System.in);
+            String line = scanner.nextLine();
+            if (Integer.parseInt(line) > 0 && Integer.parseInt(line) < 6) {
+                switch (line) {
+                    case "1" -> findAndReserveARoom();
+                    case "2" -> seeMyReservations();
+                    case "3" -> createAnAccount();
+                    case "4" -> adminMenu();
+                    case "5" -> scanner.close();
+                }
+            } else {
+                System.out.println("invalid selection");
             }
-        }
-        else {
-            System.out.println("invalid selection");
+
         }
 
-    }
 
-    private static void adminMenu() {
+    private static void adminMenu() throws ParseException {
         AdminMenu.printAdminMenu();
         Scanner scanner = new Scanner(System.in);
         String line = scanner.nextLine();
@@ -42,7 +42,7 @@ public class HotelApplication {
                 case "2" -> seeAllRooms();
                 case "3" -> seeAllReservations();
                 case "4" -> addARoom();
-                case "5" -> MainMenu.printMainMenu();
+                case "5" -> mainMenuSelection();
             }
         }
         else {
@@ -50,7 +50,7 @@ public class HotelApplication {
         }
     }
 
-    private static void addARoom() {
+    private static void addARoom() throws ParseException {
         Scanner scanner = new Scanner(System.in);
         List<IRoom> rooms = new ArrayList<>();
 
@@ -60,6 +60,7 @@ public class HotelApplication {
             System.out.println("Would you like to add another room now? (Y/N)");
         }
         AdminResource.addRoom(rooms);
+        mainMenuSelection();
     }
 
     public static Room roomDetailsToAdd() {
@@ -74,19 +75,22 @@ public class HotelApplication {
     }
 
 
-    private static void seeAllReservations() {
+    private static void seeAllReservations() throws ParseException {
         adminResource.displayAllReservations();
+        adminMenu();
     }
 
-    private static void seeAllRooms() {
+    private static void seeAllRooms() throws ParseException {
         adminResource.getAllRooms().forEach(System.out::println);
+        adminMenu();
     }
 
-    private static void seeAllCustomers() {
+    private static void seeAllCustomers() throws ParseException {
         adminResource.getAllCustomers().forEach(System.out::println);
+        adminMenu();
     }
 
-    private static void createAnAccount() {
+    private static void createAnAccount() throws ParseException {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please provide your first name");
         String firstName = scanner.nextLine();
@@ -95,13 +99,16 @@ public class HotelApplication {
         System.out.println("Please provide your email address");
         String email = scanner.nextLine();
         HotelResource.createACustomer(email, firstName, lastName);
+        System.out.println("account created!");
+        mainMenuSelection();
     }
 
-    private static void seeMyReservations() {
+    private static void seeMyReservations() throws ParseException {
         Scanner scanner = new Scanner(System.in);
         System.out.println("please enter your email");
         String email = scanner.nextLine();
         HotelResource.getCustomersReservations(email);
+        mainMenuSelection();
     }
 
     public static void findAndReserveARoom() throws ParseException {
@@ -119,7 +126,7 @@ public class HotelApplication {
         String email = "";
         if(availableRooms.isEmpty()) {
             System.out.println("unfortunately there are no available rooms for this date");
-            MainMenu.printMainMenu();
+            mainMenuSelection();
         }
         else {
             System.out.println("please enter your email");
@@ -131,6 +138,10 @@ public class HotelApplication {
 
             IRoom room = availableRooms.iterator().next();
             HotelResource.bookARoom(email, room, checkInDate, checkOutDate);
+            mainMenuSelection();
         }
+    }
+    public static void main(String[] args) throws ParseException {
+        mainMenuSelection();
     }
 }
