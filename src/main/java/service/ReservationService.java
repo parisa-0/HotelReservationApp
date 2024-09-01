@@ -5,7 +5,9 @@ import model.IRoom;
 import model.Reservation;
 import model.Room;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
 
 public class ReservationService {
@@ -53,10 +55,13 @@ public class ReservationService {
         }
 
         if(findRoomsForDates.isEmpty()) {
-            LocalDate dateCheckIn = LocalDate.from(checkInDate.toInstant());
-            LocalDate dateCheckOut = LocalDate.from(checkOutDate.toInstant());
-            dateCheckIn = dateCheckIn.plusDays(7);
-            dateCheckOut = dateCheckOut.plusDays(7);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(checkInDate);
+            cal.add(Calendar.DAY_OF_MONTH, 7);
+            Date dateCheckIn = cal.getTime();
+            cal.setTime(checkOutDate);
+            cal.add(Calendar.DAY_OF_MONTH, 7);
+            Date dateCheckOut = cal.getTime();
             for(IRoom room : allRooms.values()) {
                 for (Reservation reservation : notAvailableRooms.keySet()) {
                     if (!reservation.toString().equals(dateCheckIn.toString()) && !reservation.toString().equals(dateCheckOut.toString())) {

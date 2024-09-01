@@ -10,20 +10,30 @@ import java.util.Collection;
 import java.util.Date;
 
 public class HotelResource {
-    // Static variable
-    private static final String BASE_URL = "http://api.hotelreservation.com";
-    private final CustomerService customerService = CustomerService.getInstance();
-    private final ReservationService reservationService = ReservationService.getInstance();
 
-    public static void printBaseUrl() {
-        System.out.println("Base URL: " + BASE_URL);
+    private static HotelResource instance = new HotelResource();
+    // Step 1: Private constructor
+    private HotelResource() {
+        // Initialization code here
     }
 
-    public Customer getCustomer(String email) {
-        return getCustomer(email);
+    // Step 3: Public static method to get the instance
+    public static HotelResource getInstance() {
+        if (instance == null) {
+            instance = new HotelResource();
+        }
+        return instance;
     }
 
-    public void createACustomer(String email, String firstName, String lastName) {
+
+    private static final CustomerService customerService = CustomerService.getInstance();
+    private static final ReservationService reservationService = ReservationService.getInstance();
+
+    public static Customer getCustomer(String email) {
+        return customerService.getCustomer(email);
+    }
+
+    public static void createACustomer(String email, String firstName, String lastName) {
         customerService.addCustomer(email, firstName, lastName);
     }
 
@@ -31,11 +41,11 @@ public class HotelResource {
         return reservationService.getRoom(roomNumber);
     }
 
-    public Reservation bookARoom(String customerEmail, IRoom room, Date checkInDate, Date checkOutDate) {
+    public static Reservation bookARoom(String customerEmail, IRoom room, Date checkInDate, Date checkOutDate) {
         return reservationService.reserveARoom(getCustomer(customerEmail), room, checkInDate, checkOutDate);
     }
 
-    public Collection<Reservation> getCustomersReservations(String customerEmail) {
+    public static Collection<Reservation> getCustomersReservations(String customerEmail) {
        return reservationService.getCustomersReservation(getCustomer(customerEmail));
     }
 

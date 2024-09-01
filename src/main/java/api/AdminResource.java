@@ -9,20 +9,28 @@ import java.util.Collection;
 import java.util.List;
 
 public class AdminResource {
-    // Static variable for admin role
-    private static final String ADMIN_ROLE = "ADMIN";
-    private final CustomerService customerService = CustomerService.getInstance();
-    private final ReservationService reservationService = ReservationService.getInstance();
-
-    public static void printAdminRole() {
-        System.out.println("Admin Role: " + ADMIN_ROLE);
+    private static AdminResource instance = new AdminResource();
+    // Step 1: Private constructor
+    private AdminResource() {
+        // Initialization code here
     }
 
-    public Customer getCustomer(String email) {
+    // Step 3: Public static method to get the instance
+    public static AdminResource getInstance() {
+        if (instance == null) {
+            instance = new AdminResource();
+        }
+        return instance;
+    }
+
+    private static final CustomerService customerService = CustomerService.getInstance();
+    private static final ReservationService reservationService = ReservationService.getInstance();
+
+    public static Customer getCustomer(String email) {
         return customerService.getCustomer(email);
     }
 
-    public void addRoom(List<IRoom> rooms) {
+    public static void addRoom(List<IRoom> rooms) {
         for (IRoom room : rooms) {
             reservationService.addRoom(room);
         }
