@@ -47,9 +47,14 @@ public class ReservationService {
     public Collection<IRoom> findRooms(Date checkInDate, Date checkOutDate) {
         Set<IRoom> findRoomsForDates = new HashSet<>();
         for(IRoom room : allRooms.values()) {
-            for (Reservation reservation : notAvailableRooms.keySet()) {
-                if (!reservation.toString().equals(checkInDate.toString()) && !reservation.toString().equals(checkOutDate.toString())) {
-                    findRoomsForDates.add(room);
+            if(notAvailableRooms.isEmpty()) {
+                findRoomsForDates.add(room);
+            }
+            else {
+                for (Reservation reservation : notAvailableRooms.keySet()) {
+                    if (!reservation.toString().contains(checkInDate.toString()) && !reservation.toString().contains(checkOutDate.toString())) {
+                        findRoomsForDates.add(room);
+                    }
                 }
             }
         }
@@ -64,7 +69,8 @@ public class ReservationService {
             Date dateCheckOut = cal.getTime();
             for(IRoom room : allRooms.values()) {
                 for (Reservation reservation : notAvailableRooms.keySet()) {
-                    if (!reservation.toString().equals(dateCheckIn.toString()) && !reservation.toString().equals(dateCheckOut.toString())) {
+                    //here you need to check to see if the current reservation is before or after the other one
+                    if (dateCheckIn.after(reservation.getCheckInDate()) && dateCheckOut.before(reservation.getCheckOutDate())) {
                         findRoomsForDates.add(room);
                     }
                 }
@@ -76,7 +82,7 @@ public class ReservationService {
     public Collection<Reservation> getCustomersReservation(Customer customer) {
         Set<Reservation> customersReservation = new HashSet<>();
         for (Reservation reservation : reservations) {
-            if(reservation.toString().equals(customer.toString())) {
+            if(reservation.toString().contains(customer.toString())) {
                 customersReservation.add(reservation);
             }
         }

@@ -92,10 +92,12 @@ public class HotelApplication {
 
     private static void createAnAccount() throws ParseException {
         Scanner scanner = new Scanner(System.in);
+        String firstName = "";
+        String lastName = "";
         System.out.println("Please provide your first name");
-        String firstName = scanner.nextLine();
+        firstName = scanner.next();
         System.out.println("Please provide your last name");
-        String lastName = scanner.nextLine();
+        lastName = scanner.next();
         System.out.println("Please provide your email address");
         String email = scanner.nextLine();
         HotelResource.createACustomer(email, firstName, lastName);
@@ -107,7 +109,7 @@ public class HotelApplication {
         Scanner scanner = new Scanner(System.in);
         System.out.println("please enter your email");
         String email = scanner.nextLine();
-        HotelResource.getCustomersReservations(email);
+        System.out.println(HotelResource.getCustomersReservations(email));
         mainMenuSelection();
     }
 
@@ -130,10 +132,16 @@ public class HotelApplication {
         }
         else {
             System.out.println("please enter your email");
-            email = scanner.nextLine();
+            email = scanner.next();
 
-            if(AdminResource.getCustomer(email) == null) {
-                createAnAccount();
+            if(HotelResource.getCustomer(email) == null || email == null || email.isEmpty()) {
+                String firstName = "";
+                String lastName = "";
+                System.out.println("Please provide your first name");
+                firstName = scanner.next();
+                System.out.println("Please provide your last name");
+                lastName = scanner.next();
+                HotelResource.createACustomer(email, firstName, lastName);
             }
 
             IRoom room = availableRooms.iterator().next();
