@@ -3,11 +3,11 @@ package model;
 import java.util.regex.Pattern;
 
 public class Customer {
-    String firstName;
-    String lastName;
+    private final String firstName;
+    private final String lastName;
     String emailRegex = "^(.+)@(.+).(.+)$";
     Pattern pattern = Pattern.compile(emailRegex);
-    String email;
+    private final String email;
 
     public Customer(String firstName, String lastName, String email) {
         this.firstName = firstName;

@@ -1,9 +1,9 @@
 package model;
 
 public class Room implements IRoom {
-    String roomNumber;
+    private final String roomNumber;
     Double price;
-    RoomType enumeration;
+    private final RoomType enumeration;
 
     public Room(String roomNumber, Double price, RoomType enumeration) {
         this.roomNumber = roomNumber;
@@ -12,22 +12,22 @@ public class Room implements IRoom {
     }
 
     @Override
-    public String getRoomNumber() {
+    public final String getRoomNumber() {
         return roomNumber;
     }
 
     @Override
-    public Double getRoomPrice() {
+    public final Double getRoomPrice() {
         return price;
     }
 
     @Override
-    public RoomType getRoomType() {
+    public final RoomType getRoomType() {
         return enumeration;
     }
 
     @Override
-    public boolean isFree() {
+    public final boolean isFree() {
         return false;
     }
 

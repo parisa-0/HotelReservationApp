@@ -52,7 +52,7 @@ public class ReservationService {
             }
             else {
                 for (Reservation reservation : notAvailableRooms.keySet()) {
-                    if (!reservation.toString().contains(checkInDate.toString()) && !reservation.toString().contains(checkOutDate.toString())) {
+                    if (!checkInDate.after(reservation.getCheckInDate()) && checkInDate.before(reservation.getCheckOutDate())) {
                         findRoomsForDates.add(room);
                     }
                 }
