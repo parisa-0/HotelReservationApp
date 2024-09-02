@@ -3,21 +3,9 @@ import api.HotelResource;
 import model.IRoom;
 import model.Room;
 import model.RoomType;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
-/*
-reserving a room as a different customer for the same dates room should not be available + 7 days if still not avail
-then not available - THIS IS FAILING
-Fix your find and reserve a room:
-The app should show the list of available rooms so the user can choose one of them.
-Currently, the app does not show the available rooms: Please make sure to only show available rooms for the user.
-When no room is available for the requested date range the app should suggest a new date range with available rooms as stated in the project instructions:
-Currently, the app is creating multiple reservations for the same room when the same dates are inputted:
-Tip: A user should not be able to book a single room twice for the same date range.
-*/
 
 public class HotelApplication {
     private static final HotelResource hotelResource = HotelResource.getInstance();
@@ -173,30 +161,76 @@ public class HotelApplication {
         Date checkOutDate = sdf.parse(checkOut);
         Collection<IRoom> availableRooms = hotelResource.findARooms(checkInDate, checkOutDate);
         String email = "";
+        /*
         if(availableRooms.isEmpty()) {
             System.out.println("unfortunately there are no available rooms for this date");
             mainMenuSelection();
         }
+
+         */
+        if (availableRooms.isEmpty()) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(checkInDate);
+            //  cal.add(Calendar.DAY_OF_MONTH, 7);
+            cal.add(Calendar.DATE, 7);
+            Date dateCheckIn = cal.getTime();
+            // cal.add(Calendar.DAY_OF_MONTH, 7);
+            cal.add(Calendar.DATE, 7);
+            Date dateCheckOut = cal.getTime();
+            Collection<IRoom> alternativeRooms = hotelResource.findARooms(dateCheckIn, dateCheckOut);
+            if (alternativeRooms.isEmpty()) {
+                System.out.println("unfortunately there are no available rooms for this date");
+                mainMenuSelection();
+            } else {
+                System.out.println("We don't have a room available for the date you selected, please see new check in date and check out date below:");
+                System.out.println("Check in date: " + dateCheckIn);
+                System.out.println("Check out date: " + dateCheckOut);
+
+                for (IRoom alternativeRoom : alternativeRooms) {
+                    System.out.println(alternativeRoom);
+                }
+
+                System.out.println("Please select the room number you require");
+                String roomNumber = scanner.next();
+
+                System.out.println("please enter your email");
+                email = scanner.next();
+                getCustomerDetails(email);
+
+                HotelResource.bookARoom(email, hotelResource.getRoom(roomNumber), dateCheckIn, dateCheckOut);
+                mainMenuSelection();
+            }
+        }
         else {
+            System.out.println("Here are a list of available rooms:");
+            for (IRoom availableRoom : availableRooms) {
+                System.out.println(availableRoom);
+            }
+            System.out.println("Please select the room number you require");
+            String roomNumber = scanner.next();
+
             System.out.println("please enter your email");
             email = scanner.next();
+            getCustomerDetails(email);
 
-            if(HotelResource.getCustomer(email) == null || email == null || email.isEmpty()) {
-                String firstName = "";
-                String lastName = "";
-                System.out.println("Please provide your first name");
-                firstName = scanner.next();
-                System.out.println("Please provide your last name");
-                lastName = scanner.next();
-                HotelResource.createACustomer(email, firstName, lastName);
-            }
-
-            IRoom room = availableRooms.iterator().next();
-            HotelResource.bookARoom(email, room, checkInDate, checkOutDate);
+            HotelResource.bookARoom(email, hotelResource.getRoom(roomNumber), checkInDate, checkOutDate);
             mainMenuSelection();
         }
     }
     public static void main(String[] args) throws ParseException {
         mainMenuSelection();
+    }
+
+    public static void getCustomerDetails(String email) throws ParseException {
+        if(HotelResource.getCustomer(email) == null || email == null || email.isEmpty()) {
+            Scanner scanner = new Scanner(System.in);
+            String firstName = "";
+            String lastName = "";
+            System.out.println("Please provide your first name");
+            firstName = scanner.next();
+            System.out.println("Please provide your last name");
+            lastName = scanner.next();
+            HotelResource.createACustomer(email, firstName, lastName);
+        }
     }
 }

@@ -15,6 +15,8 @@ public class ReservationService {
     Set<Reservation> reservations = new HashSet<>();
     Map<Reservation, IRoom> notAvailableRooms = new HashMap<>();
 
+
+
     private static ReservationService instance = new ReservationService();
 
     // Step 1: Private constructor
@@ -47,35 +49,42 @@ public class ReservationService {
     public Collection<IRoom> findRooms(Date checkInDate, Date checkOutDate) {
         Set<IRoom> findRoomsForDates = new HashSet<>();
         for(IRoom room : allRooms.values()) {
-            if(notAvailableRooms.isEmpty()) {
+            if(notAvailableRooms.isEmpty() || !notAvailableRooms.containsValue(room)) {
                 findRoomsForDates.add(room);
             }
             else {
                 for (Reservation reservation : notAvailableRooms.keySet()) {
-                    if (!checkInDate.after(reservation.getCheckInDate()) && checkInDate.before(reservation.getCheckOutDate())) {
+                    if (!checkInDate.after(reservation.getCheckInDate()) || !checkOutDate.before(reservation.getCheckOutDate())) {
                         findRoomsForDates.add(room);
                     }
                 }
             }
         }
-
+/*
         if(findRoomsForDates.isEmpty()) {
             Calendar cal = Calendar.getInstance();
             cal.setTime(checkInDate);
-            cal.add(Calendar.DAY_OF_MONTH, 7);
+            //  cal.add(Calendar.DAY_OF_MONTH, 7);
+            cal.add(Calendar.DATE, 7);
             Date dateCheckIn = cal.getTime();
-            cal.setTime(checkOutDate);
-            cal.add(Calendar.DAY_OF_MONTH, 7);
+            // cal.add(Calendar.DAY_OF_MONTH, 7);
+            cal.add(Calendar.DATE, 7);
             Date dateCheckOut = cal.getTime();
             for(IRoom room : allRooms.values()) {
                 for (Reservation reservation : notAvailableRooms.keySet()) {
-                    //here you need to check to see if the current reservation is before or after the other one
-                    if (dateCheckIn.after(reservation.getCheckInDate()) && dateCheckOut.before(reservation.getCheckOutDate())) {
+                    if (!dateCheckIn.after(reservation.getCheckInDate()) || !dateCheckOut.before(reservation.getCheckOutDate())) {
                         findRoomsForDates.add(room);
                     }
                 }
             }
+            System.out.println("We don't have a room available for the date you selected, please see new check in date and check out date below:");
+            System.out.println("Check in date: " + dateCheckIn);
+            System.out.println("Check out date: " + dateCheckOut);
         }
+
+
+ */
+
         return findRoomsForDates;
     }
 
@@ -98,4 +107,6 @@ public class ReservationService {
             System.out.println(reservation.toString());
         }
     }
+
+
 }
