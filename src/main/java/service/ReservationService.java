@@ -13,7 +13,7 @@ import java.util.*;
 public class ReservationService {
     Map<String, IRoom> allRooms = new HashMap<>();
     Set<Reservation> reservations = new HashSet<>();
-    Map<Reservation, IRoom> notAvailableRooms = new HashMap<>();
+   // Map<Reservation, IRoom> notAvailableRooms = new HashMap<>();
 
 
 
@@ -42,16 +42,20 @@ public class ReservationService {
     public Reservation reserveARoom(Customer customer, IRoom room, Date checkInDate, Date checkOutDate) {
         Reservation reservation = new Reservation(customer, room, checkInDate, checkOutDate);
         reservations.add(reservation);
-        notAvailableRooms.put(reservation, room);
+      //  notAvailableRooms.put(reservation, room);
         return reservation;
     }
 
     public Collection<IRoom> findRooms(Date checkInDate, Date checkOutDate) {
         Set<IRoom> findRoomsForDates = new HashSet<>();
+
+
         for(IRoom room : allRooms.values()) {
-            if(notAvailableRooms.isEmpty() || !notAvailableRooms.containsValue(room)) {
+            if (isRoomAvailable((Room) room, checkInDate, checkOutDate)) {
                 findRoomsForDates.add(room);
             }
+        }
+            /*
             else {
                 for (Reservation reservation : notAvailableRooms.keySet()) {
                     if (!checkInDate.after(reservation.getCheckInDate()) || !checkOutDate.before(reservation.getCheckOutDate())) {
@@ -59,8 +63,9 @@ public class ReservationService {
                     }
                 }
             }
+
         }
-/*
+
         if(findRoomsForDates.isEmpty()) {
             Calendar cal = Calendar.getInstance();
             cal.setTime(checkInDate);
@@ -108,5 +113,18 @@ public class ReservationService {
         }
     }
 
+    public boolean isRoomAvailable(Room room, Date checkIn, Date checkOut) {
+        for (Reservation reservation : reservations) {
+            if (reservation.getRoom().equals(room)) {
+                Date existingCheckIn = reservation.getCheckInDate();
+                Date existingCheckOut = reservation.getCheckOutDate();
+                // Check for overlap
+                if (checkIn.before(existingCheckOut) && checkOut.after(existingCheckIn)) {
+                    return false; // Room is not available
+                }
+            }
+        }
+        return true; // Room is available
+    }
 
 }
