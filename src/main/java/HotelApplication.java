@@ -3,6 +3,7 @@ import api.HotelResource;
 import model.IRoom;
 import model.Room;
 import model.RoomType;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -12,29 +13,28 @@ public class HotelApplication {
     private static final AdminResource adminResource = AdminResource.getInstance();
 
 
-        private static void mainMenuSelection() throws ParseException {
-            MainMenu.printMainMenu();
-            Scanner scanner = new Scanner(System.in);
-            String line = scanner.nextLine();
-            try {
-                if (Integer.parseInt(line) > 0 && Integer.parseInt(line) < 6) {
-                    switch (line) {
-                        case "1" -> findAndReserveARoom();
-                        case "2" -> seeMyReservations();
-                        case "3" -> createAnAccount();
-                        case "4" -> adminMenu();
-                        case "5" -> scanner.close();
-                    }
-                } else {
-                    System.out.println("invalid selection");
+    private static void mainMenuSelection() throws ParseException {
+        MainMenu.printMainMenu();
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+        try {
+            if (Integer.parseInt(line) > 0 && Integer.parseInt(line) < 6) {
+                switch (line) {
+                    case "1" -> findAndReserveARoom();
+                    case "2" -> seeMyReservations();
+                    case "3" -> createAnAccount();
+                    case "4" -> adminMenu();
+                    case "5" -> scanner.close();
                 }
+            } else {
+                System.out.println("invalid selection");
             }
-            catch (NumberFormatException e) {
-                System.out.println("please enter a valid selection");
-                mainMenuSelection();
-            }
-
+        } catch (NumberFormatException e) {
+            System.out.println("please enter a valid selection");
+            mainMenuSelection();
         }
+
+    }
 
     private static void adminMenu() throws ParseException {
         AdminMenu.printAdminMenu();
@@ -53,8 +53,7 @@ public class HotelApplication {
             } else {
                 System.out.println("invalid selection");
             }
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             System.out.println("please enter a valid selection");
             adminMenu();
         }
@@ -65,7 +64,7 @@ public class HotelApplication {
         List<IRoom> rooms = new ArrayList<>();
 
         System.out.println("Would you like to add a room now? (Y/N)");
-        while(scanner.nextLine().equalsIgnoreCase("y")) {
+        while (scanner.nextLine().equalsIgnoreCase("y")) {
             rooms.add(roomDetailsToAdd());
             AdminResource.addRoom(rooms);
             System.out.println("Would you like to add another room now? (Y/N)");
@@ -77,10 +76,10 @@ public class HotelApplication {
     public static Room roomDetailsToAdd() {
         Scanner scanner = new Scanner(System.in);
         String roomNumber = null;
-        while(roomNumber == null) {
+        while (roomNumber == null) {
             System.out.println("Please Enter the room number");
             roomNumber = scanner.next();
-            if(hotelResource.getRoom(roomNumber) != null) {
+            if (hotelResource.getRoom(roomNumber) != null) {
                 System.out.println("Room already exists");
                 System.out.println("Please enter another room number");
                 roomNumber = null;
@@ -90,12 +89,11 @@ public class HotelApplication {
         System.out.println("Please enter the price");
         Double price = scanner.nextDouble();
         RoomType type = null;
-        while(type == null) {
+        while (type == null) {
             try {
                 System.out.println("Please enter room type as SINGLE or DOUBLE");
                 type = RoomType.valueOf(scanner.next().toUpperCase());
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
                 System.out.println("invalid room type, please enter SINGLE or DOUBLE");
                 roomDetailsToAdd();
             }
@@ -155,7 +153,7 @@ public class HotelApplication {
         System.out.println("Enter Check in date (dd/mm/yyyy)");
         String checkIn = scanner.next();
         System.out.println("Enter Check out date (dd/mm/yyyy)");
-        String checkOut =  scanner.next();
+        String checkOut = scanner.next();
 
         Date checkInDate = sdf.parse(checkIn);
         Date checkOutDate = sdf.parse(checkOut);
@@ -171,10 +169,10 @@ public class HotelApplication {
         if (availableRooms.isEmpty()) {
             Calendar cal = Calendar.getInstance();
             cal.setTime(checkInDate);
-           //  cal.add(Calendar.DAY_OF_WEEK, 7);
+            //  cal.add(Calendar.DAY_OF_WEEK, 7);
             cal.add(Calendar.DATE, 7);
             Date dateCheckIn = cal.getTime();
-           //  cal.add(Calendar.DAY_OF_WEEK, 7);
+            //  cal.add(Calendar.DAY_OF_WEEK, 7);
             cal.setTime(checkOutDate);
             cal.add(Calendar.DATE, 7);
             Date dateCheckOut = cal.getTime();
@@ -193,37 +191,50 @@ public class HotelApplication {
 
                 System.out.println("Please select the room number you require");
                 String roomNumber = scanner.next();
+                while(!preventDoubleBooking(roomNumber, alternativeRooms)) {
+                    System.out.println("Here are a list of available rooms (please book one of these rooms):");
+                    for (IRoom availableRoom : availableRooms) {
+                        System.out.println(availableRoom);
+                    }
+                    roomNumber = scanner.next();
+                }
 
                 System.out.println("please enter your email");
                 email = scanner.next();
                 getCustomerDetails(email);
 
                 HotelResource.bookARoom(email, hotelResource.getRoom(roomNumber), dateCheckIn, dateCheckOut);
+                availableRooms.remove(hotelResource.getRoom(roomNumber));
                 mainMenuSelection();
             }
-        }
-        else {
+        } else {
             System.out.println("Here are a list of available rooms:");
             for (IRoom availableRoom : availableRooms) {
                 System.out.println(availableRoom);
             }
             System.out.println("Please select the room number you require");
             String roomNumber = scanner.next();
-
+            while(!preventDoubleBooking(roomNumber, availableRooms)) {
+                System.out.println("Here are a list of available rooms (please book one of these rooms):");
+                for (IRoom availableRoom : availableRooms) {
+                    System.out.println(availableRoom);
+                }
+                roomNumber = scanner.next();
+            }
             System.out.println("please enter your email");
             email = scanner.next();
             getCustomerDetails(email);
-
             HotelResource.bookARoom(email, hotelResource.getRoom(roomNumber), checkInDate, checkOutDate);
             mainMenuSelection();
         }
     }
+
     public static void main(String[] args) throws ParseException {
         mainMenuSelection();
     }
 
     public static void getCustomerDetails(String email) throws ParseException {
-        if(HotelResource.getCustomer(email) == null || email == null || email.isEmpty()) {
+        if (HotelResource.getCustomer(email) == null || email == null || email.isEmpty()) {
             Scanner scanner = new Scanner(System.in);
             String firstName = "";
             String lastName = "";
@@ -233,5 +244,13 @@ public class HotelApplication {
             lastName = scanner.next();
             HotelResource.createACustomer(email, firstName, lastName);
         }
+    }
+
+    public static boolean preventDoubleBooking(String roomNumber, Collection<IRoom> availableRooms) {
+        if (!availableRooms.toString().contains("Room Number:" + roomNumber + ",")) {
+            System.out.println("Room " + roomNumber + " does not exist or is already booked.");
+            return false;
+        }
+        return true;
     }
 }
