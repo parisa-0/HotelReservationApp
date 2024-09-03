@@ -171,10 +171,11 @@ public class HotelApplication {
         if (availableRooms.isEmpty()) {
             Calendar cal = Calendar.getInstance();
             cal.setTime(checkInDate);
-            //  cal.add(Calendar.DAY_OF_MONTH, 7);
+           //  cal.add(Calendar.DAY_OF_WEEK, 7);
             cal.add(Calendar.DATE, 7);
             Date dateCheckIn = cal.getTime();
-            // cal.add(Calendar.DAY_OF_MONTH, 7);
+           //  cal.add(Calendar.DAY_OF_WEEK, 7);
+            cal.setTime(checkOutDate);
             cal.add(Calendar.DATE, 7);
             Date dateCheckOut = cal.getTime();
             Collection<IRoom> alternativeRooms = hotelResource.findARooms(dateCheckIn, dateCheckOut);
