@@ -6,6 +6,9 @@ import model.RoomType;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 public class HotelApplication {
@@ -73,24 +76,41 @@ public class HotelApplication {
         mainMenuSelection();
     }
 
-    public static Room roomDetailsToAdd() {
-        Scanner scanner = new Scanner(System.in);
-        String roomNumber = null;
-        while (roomNumber == null) {
+    public static Room roomDetailsToAdd() throws ParseException {
+
+        int roomNumber = -1;
+        while (roomNumber < 0) {
+            Scanner scanner = new Scanner(System.in);
             System.out.println("Please Enter the room number");
-            roomNumber = scanner.next();
-            if (hotelResource.getRoom(roomNumber) != null) {
+            try {
+                roomNumber = scanner.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Please enter a valid integer for the room number.");
+                roomNumber = -1;
+            }
+            if (hotelResource.getRoom(String.valueOf(roomNumber)) != null) {
                 System.out.println("Room already exists");
                 System.out.println("Please enter another room number");
-                roomNumber = null;
+                roomNumber = -1;
             }
         }
 
-        System.out.println("Please enter the price");
-        Double price = scanner.nextDouble();
+        Double price = -1.0;
+        while (price < 0.0) {
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Please enter the price");
+            try {
+                price = scanner.nextDouble();
+            } catch (InputMismatchException e) {
+                System.out.println("Please enter a valid number for price.");
+                roomNumber = -1;
+            }
+        }
+
         RoomType type = null;
         while (type == null) {
             try {
+                Scanner scanner = new Scanner(System.in);
                 System.out.println("Please enter room type as SINGLE or DOUBLE");
                 type = RoomType.valueOf(scanner.next().toUpperCase());
             } catch (Exception e) {
@@ -98,7 +118,7 @@ public class HotelApplication {
                 roomDetailsToAdd();
             }
         }
-        return new Room(roomNumber, price, type);
+        return new Room(String.valueOf(roomNumber), price, type);
     }
 
 
@@ -148,42 +168,62 @@ public class HotelApplication {
 
     public static void findAndReserveARoom() throws ParseException {
         Scanner scanner = new Scanner(System.in);
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-        System.out.println("Enter Check in date (dd/mm/yyyy)");
-        String checkIn = scanner.next();
-        System.out.println("Enter Check out date (dd/mm/yyyy)");
-        String checkOut = scanner.next();
+            LocalDate checkIn = null;
+            boolean validDateCheckIn = false;
 
-        Date checkInDate = sdf.parse(checkIn);
-        Date checkOutDate = sdf.parse(checkOut);
-        Collection<IRoom> availableRooms = hotelResource.findARooms(checkInDate, checkOutDate);
-        String email = "";
-        /*
-        if(availableRooms.isEmpty()) {
-            System.out.println("unfortunately there are no available rooms for this date");
-            mainMenuSelection();
+            while (!validDateCheckIn) {
+                System.out.print("Enter check-in date (yyyy-MM-dd): ");
+                String dateInput = scanner.next();
+
+                try {
+                    checkIn = LocalDate.parse(dateInput, DateTimeFormatter.ISO_LOCAL_DATE);
+
+                    if (checkIn.isBefore(LocalDate.now())) {
+                        System.out.println("Check-in date cannot be in the past. Please enter a valid date.");
+                    } else {
+                        validDateCheckIn = true;
+                    }
+                } catch (DateTimeParseException e) {
+                    System.out.println("Invalid date format. Please use yyyy-MM-dd format.");
+                }
+            }
+
+        LocalDate checkOut = null;
+        boolean validDateCheckOut = false;
+
+        while (!validDateCheckOut) {
+            System.out.print("Enter check-in date (yyyy-MM-dd): ");
+            String dateInput = scanner.next();
+
+            try {
+                checkOut = LocalDate.parse(dateInput, DateTimeFormatter.ISO_LOCAL_DATE);
+
+                if (checkOut.isBefore(LocalDate.now()) || checkOut.isBefore(checkIn)) {
+                    System.out.println("Check-out date cannot be in the past or before Check-in date. Please enter a valid date.");
+                } else {
+                    validDateCheckOut = true;
+                }
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Please use yyyy-MM-dd format.");
+            }
         }
 
-         */
+        Date checkInDate = sdf.parse(String.valueOf(checkIn));
+        Date checkOutDate = sdf.parse(String.valueOf(checkOut));
+        Collection<IRoom> availableRooms = hotelResource.findARooms(checkInDate, checkOutDate);
+        String email = "";
+
         if (availableRooms.isEmpty()) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(checkInDate);
-            //  cal.add(Calendar.DAY_OF_WEEK, 7);
-            cal.add(Calendar.DATE, 7);
-            Date dateCheckIn = cal.getTime();
-            //  cal.add(Calendar.DAY_OF_WEEK, 7);
-            cal.setTime(checkOutDate);
-            cal.add(Calendar.DATE, 7);
-            Date dateCheckOut = cal.getTime();
-            Collection<IRoom> alternativeRooms = hotelResource.findARooms(dateCheckIn, dateCheckOut);
+            Collection<IRoom> alternativeRooms = hotelResource.findRecommendedRooms(checkInDate, checkOutDate);
             if (alternativeRooms.isEmpty()) {
                 System.out.println("unfortunately there are no available rooms for this date");
                 mainMenuSelection();
             } else {
                 System.out.println("We don't have a room available for the date you selected, please see new check in date and check out date below:");
-                System.out.println("Check in date: " + dateCheckIn);
-                System.out.println("Check out date: " + dateCheckOut);
+                System.out.println("Check in date: " + hotelResource.addDays(checkInDate));
+                System.out.println("Check out date: " + hotelResource.addDays(checkOutDate));
 
                 for (IRoom alternativeRoom : alternativeRooms) {
                     System.out.println(alternativeRoom);
@@ -203,7 +243,7 @@ public class HotelApplication {
                 email = scanner.next();
                 getCustomerDetails(email);
 
-                HotelResource.bookARoom(email, hotelResource.getRoom(roomNumber), dateCheckIn, dateCheckOut);
+                HotelResource.bookARoom(email, hotelResource.getRoom(roomNumber), hotelResource.addDays(checkInDate), hotelResource.addDays(checkOutDate));
                 availableRooms.remove(hotelResource.getRoom(roomNumber));
                 mainMenuSelection();
             }

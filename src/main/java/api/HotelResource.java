@@ -12,12 +12,10 @@ import java.util.Date;
 public class HotelResource {
 
     private static HotelResource instance = new HotelResource();
-    // Step 1: Private constructor
+
     private HotelResource() {
-        // Initialization code here
     }
 
-    // Step 3: Public static method to get the instance
     public static HotelResource getInstance() {
         if (instance == null) {
             instance = new HotelResource();
@@ -51,5 +49,13 @@ public class HotelResource {
 
     public Collection<IRoom> findARooms(Date checkIn, Date checkOut) {
         return reservationService.findRooms(checkIn,checkOut);
+    }
+
+    public Collection<IRoom> findRecommendedRooms(Date checkIn, Date checkOut) {
+        return reservationService.findRecommendedRooms(checkIn,checkOut);
+    }
+
+    public Date addDays(Date date) {
+        return reservationService.addDays(date);
     }
  }

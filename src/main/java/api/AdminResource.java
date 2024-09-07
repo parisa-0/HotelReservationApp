@@ -10,12 +10,10 @@ import java.util.List;
 
 public class AdminResource {
     private static AdminResource instance = new AdminResource();
-    // Step 1: Private constructor
+
     private AdminResource() {
-        // Initialization code here
     }
 
-    // Step 3: Public static method to get the instance
     public static AdminResource getInstance() {
         if (instance == null) {
             instance = new AdminResource();

@@ -12,12 +12,9 @@ public class CustomerService {
 
     private static CustomerService instance = new CustomerService();
 
-    // Step 1: Private constructor
     private CustomerService() {
-        // Initialization code here
     }
 
-    // Step 3: Public static method to get the instance
     public static CustomerService getInstance() {
         if (instance == null) {
             instance = new CustomerService();
@@ -43,21 +40,5 @@ public class CustomerService {
    public static Collection<Customer> getAllCustomers() {
         return customers;
    }
-/*
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Please provide your first name");
-        String firstName = scanner.nextLine();
-        System.out.println("Please provide your last name");
-        String lastName = scanner.nextLine();
-        System.out.println("Please provide your email address");
-        String email = scanner.nextLine();
-        HotelResource.createACustomer(email, firstName, lastName);
-        System.out.println("account created!");
-        addCustomer(email, firstName,lastName);
-        System.out.println(customers);
-        System.out.println(getAllCustomers());
-    }
 
- */
 }
