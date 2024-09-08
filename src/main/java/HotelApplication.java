@@ -194,7 +194,7 @@ public class HotelApplication {
         boolean validDateCheckOut = false;
 
         while (!validDateCheckOut) {
-            System.out.print("Enter check-in date (yyyy-MM-dd): ");
+            System.out.print("Enter check-out date (yyyy-MM-dd): ");
             String dateInput = scanner.next();
 
             try {
@@ -225,19 +225,7 @@ public class HotelApplication {
                 System.out.println("Check in date: " + hotelResource.addDays(checkInDate));
                 System.out.println("Check out date: " + hotelResource.addDays(checkOutDate));
 
-                for (IRoom alternativeRoom : alternativeRooms) {
-                    System.out.println(alternativeRoom);
-                }
-
-                System.out.println("Please select the room number you require");
-                String roomNumber = scanner.next();
-                while(!preventDoubleBooking(roomNumber, alternativeRooms)) {
-                    System.out.println("Here are a list of available rooms (please book one of these rooms):");
-                    for (IRoom availableRoom : availableRooms) {
-                        System.out.println(availableRoom);
-                    }
-                    roomNumber = scanner.next();
-                }
+                String roomNumber = getRoomNumber( alternativeRooms, scanner);
 
                 System.out.println("please enter your email");
                 email = scanner.next();
@@ -248,19 +236,7 @@ public class HotelApplication {
                 mainMenuSelection();
             }
         } else {
-            System.out.println("Here are a list of available rooms:");
-            for (IRoom availableRoom : availableRooms) {
-                System.out.println(availableRoom);
-            }
-            System.out.println("Please select the room number you require");
-            String roomNumber = scanner.next();
-            while(!preventDoubleBooking(roomNumber, availableRooms)) {
-                System.out.println("Here are a list of available rooms (please book one of these rooms):");
-                for (IRoom availableRoom : availableRooms) {
-                    System.out.println(availableRoom);
-                }
-                roomNumber = scanner.next();
-            }
+           String roomNumber = getRoomNumber(availableRooms, scanner);
             System.out.println("please enter your email");
             email = scanner.next();
             getCustomerDetails(email);
@@ -292,5 +268,19 @@ public class HotelApplication {
             return false;
         }
         return true;
+    }
+
+    public static String getRoomNumber( Collection<IRoom> availableRooms, Scanner scanner) {
+        System.out.println("Here are a list of available rooms:");
+        availableRooms.forEach(System.out::println);
+
+        System.out.println("Please select the room number you require");
+        String roomNumber = scanner.next();
+        while(!preventDoubleBooking(roomNumber, availableRooms)) {
+            System.out.println("Here are a list of available rooms (please book one of these rooms):");
+            availableRooms.forEach(System.out::println);
+            roomNumber = scanner.next();
+        }
+        return roomNumber;
     }
 }

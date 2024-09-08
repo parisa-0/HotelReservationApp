@@ -3,10 +3,7 @@ package service;
 import api.HotelResource;
 import model.Customer;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class CustomerService {
 
@@ -29,12 +26,10 @@ public class CustomerService {
     }
 
    public Customer getCustomer(String customerEmail) {
-        for (Customer customer : customers) {
-            if(customer.toString().contains(customerEmail)) {
-                return customer;
-            }
-        }
-        return null;
+       return customers.stream()
+                .filter(c -> c.toString().contains(customerEmail))
+                .findFirst()
+                .orElse(null);
    }
 
    public static Collection<Customer> getAllCustomers() {

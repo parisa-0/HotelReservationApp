@@ -9,12 +9,12 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ReservationService {
     Map<String, IRoom> allRooms = new HashMap<>();
     Set<Reservation> reservations = new HashSet<>();
-
-
+    int numberOfDaysToAddForReservation = 7;
 
     private static ReservationService instance = new ReservationService();
 
@@ -42,24 +42,15 @@ public class ReservationService {
     }
 
     public Collection<IRoom> findRooms(Date checkInDate, Date checkOutDate) {
-        Set<IRoom> findRoomsForDates = new HashSet<>();
-
-        for(IRoom room : allRooms.values()) {
-            if (isRoomAvailable((Room) room, checkInDate, checkOutDate)) {
-                findRoomsForDates.add(room);
-            }
-        }
-        return findRoomsForDates;
+        return allRooms.values().stream()
+                .filter(room -> isRoomAvailable((Room) room, checkInDate, checkOutDate))
+                .collect(Collectors.toSet());
     }
 
     public Collection<Reservation> getCustomersReservation(Customer customer) {
-        Set<Reservation> customersReservation = new HashSet<>();
-        for (Reservation reservation : reservations) {
-            if(reservation.toString().contains(customer.toString())) {
-                customersReservation.add(reservation);
-            }
-        }
-        return customersReservation;
+        return reservations.stream()
+                .filter(res -> res.toString().contains(customer.toString()))
+                .collect(Collectors.toSet());
     }
 
     public Collection<IRoom> getAllRooms() {
@@ -67,9 +58,7 @@ public class ReservationService {
     }
 
     public void printAllReservation() {
-        for(Reservation reservation : reservations) {
-            System.out.println(reservation.toString());
-        }
+        reservations.forEach(System.out::println);
     }
 
     public boolean isRoomAvailable(Room room, Date checkIn, Date checkOut) {
@@ -94,8 +83,7 @@ public class ReservationService {
     public Date addDays(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
-        calendar.add(Calendar.DATE, 7);
-
+        calendar.add(Calendar.DATE, numberOfDaysToAddForReservation);
         return calendar.getTime();
     }
 
