@@ -23,10 +23,7 @@ This project is a simple back-end Java application designed for booking hotel ro
 - Validate input using regular expressions
 
 ## Installation
-To run the project, ensure you have Java installed on your machine. Clone the repository and compile the Java files.
+To run the project, ensure you have Java installed on your machine. Clone the repository and run the application.
 
 ```bash
-git clone https://github.com/parisa-0/hotel-reservation-app.git
-cd hotel-reservation-app
-javac -d bin src/*.java
-java -cp bin Main
+git clone https://github.com/parisa-0/hotelreservationapp.git
